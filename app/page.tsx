@@ -61,7 +61,6 @@ export default function SolarBillGenerator() {
     city: 'SURAT',
     pincode: '394107',
     state: 'Gujarat',
-    stateCode: '24',
     phone: '99131 68126',
     gstin: '24CBAPB8912R1ZG',
     bankName: 'ICICI BANK LTD (2898)',
@@ -75,10 +74,8 @@ export default function SolarBillGenerator() {
     city: 'Surat',
     pincode: '395010',
     state: 'Gujarat',
-    stateCode: '24',
     phone: '',
     invoiceNo: '',
-    vehicleNo: 'GJ05CU2929',
     eWayBillNo: '',
   });
 
@@ -169,12 +166,12 @@ export default function SolarBillGenerator() {
     doc.text(`${company.address}, ${company.city} - ${company.pincode}`, 16, y + 9);
     doc.text(`MO. No. ${company.phone}`, 16, y + 13);
     doc.text(`GSTIN/UIN: ${company.gstin}`, 16, y + 17);
-    doc.text(`State Name : ${company.state}, Code : ${company.stateCode}`, 16, y + 21);
+    doc.text(`State Name : ${company.state}`, 16, y + 21);
 
     doc.text(`Invoice No. : ${client.invoiceNo}`, 108, y + 5);
     doc.text(`e-Way Bill No. : ${client.eWayBillNo || ''}`, 145, y + 5);
     doc.text(`Dated : ${currentDate}`, 108, y + 9);
-    doc.text(`State Name : ${company.state}, Code : ${company.stateCode}`, 108, y + 21);
+    doc.text(`State Name : ${company.state}`, 108, y + 21);
 
     y += 30;
 
@@ -190,11 +187,7 @@ export default function SolarBillGenerator() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.text(`${client.address ? client.address + ', ' : ''}${client.city} - ${client.pincode}`, 16, y + 12);
-    doc.text(`State Name : ${client.state}, Code : ${client.stateCode}`, 16, y + 16);
-
-    doc.text('Motor Vehicle No. :', 108, y + 4);
-    doc.setFont('helvetica', 'bold');
-    doc.text(client.vehicleNo || '---', 108, y + 9);
+    doc.text(`State Name : ${client.state}`, 16, y + 16);
 
     y += 20;
 
@@ -395,10 +388,6 @@ export default function SolarBillGenerator() {
               <label className="block text-xs font-medium text-gray-600">State</label>
               <input type="text" placeholder="Gujarat" value={client.state} onChange={e => setClient({...client, state: e.target.value})} className="w-full p-2 border rounded text-sm mt-1 bg-white" required />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600">Vehicle No.</label>
-              <input type="text" placeholder="GJ05CU2929" value={client.vehicleNo} onChange={e => setClient({...client, vehicleNo: e.target.value})} className="w-full p-2 border rounded text-sm mt-1 bg-white" />
-            </div>
           </div>
 
           <div className="bg-gray-50 p-4 rounded-md border">
@@ -492,12 +481,12 @@ export default function SolarBillGenerator() {
             <p>{company.address}, {company.city} - {company.pincode}</p>
             <p>MO. No. {company.phone}</p>
             <p>GSTIN/UIN: {company.gstin}</p>
-            <p>State Name : {company.state}, Code : {company.stateCode}</p>
+            <p>State Name : {company.state}</p>
           </div>
           <div className="p-2.5 space-y-1">
             <p><span className="font-semibold">Invoice No.:</span> {client.invoiceNo || '---'}</p>
             <p><span className="font-semibold">Dated:</span> {currentDate}</p>
-            <p className="pt-3">State Name : {company.state}, Code : {company.stateCode}</p>
+            <p className="pt-3">State Name : {company.state}</p>
           </div>
         </div>
 
@@ -506,10 +495,7 @@ export default function SolarBillGenerator() {
             <p className="font-bold text-gray-700">Buyer (Bill to):</p>
             <p className="font-bold text-sm">{client.name || '---'}</p>
             <p>{client.address ? `${client.address}, ` : ''}{client.city} - {client.pincode}</p>
-            <p>State Name : {client.state}, Code : {client.stateCode}</p>
-          </div>
-          <div className="border-l border-black pl-2.5 flex flex-col justify-center">
-            <p><span className="font-semibold">Motor Vehicle No.:</span> {client.vehicleNo || '---'}</p>
+            <p>State Name : {client.state}</p>
           </div>
         </div>
 

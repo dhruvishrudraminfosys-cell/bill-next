@@ -20,15 +20,28 @@ function numberToWords(num: number): string {
   const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
   function inWords(n: number): string {
-    if ((n = n.toString()).length > 9) return 'overflow';
-    let nArray: any = ('000000000' + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    const nString = String(n);
+    if (nString.length > 9) return 'overflow';
+
+    const nArray: RegExpMatchArray | null = ('000000000' + nString).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
     if (!nArray) return '';
+
+    const getValue = (value: string): string => {
+      const numericValue = Number(value);
+      if (numericValue === 0) return '';
+      if (numericValue < 20) return a[numericValue];
+
+      const tensValue = Number(value[0]);
+      const onesValue = Number(value[1]);
+      return `${b[tensValue] || ''} ${a[onesValue] || ''}`.trim();
+    };
+
     let str = '';
-    str += (nArray[1] != 0) ? (a[Number(nArray[1])] || b[nArray[1][0]] + ' ' + a[nArray[1][1]]) + 'Crore ' : '';
-    str += (nArray[2] != 0) ? (a[Number(nArray[2])] || b[nArray[2][0]] + ' ' + a[nArray[2][1]]) + 'Lakh ' : '';
-    str += (nArray[3] != 0) ? (a[Number(nArray[3])] || b[nArray[3][0]] + ' ' + a[nArray[3][1]]) + 'Thousand ' : '';
-    str += (nArray[4] != 0) ? (a[Number(nArray[4])] || b[nArray[4][0]] + ' ' + a[nArray[4][1]]) + 'Hundred ' : '';
-    str += (nArray[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(nArray[5])] || b[nArray[5][0]] + ' ' + a[nArray[5][1]]) : '';
+    str += (Number(nArray[1]) !== 0) ? `${getValue(nArray[1])} Crore ` : '';
+    str += (Number(nArray[2]) !== 0) ? `${getValue(nArray[2])} Lakh ` : '';
+    str += (Number(nArray[3]) !== 0) ? `${getValue(nArray[3])} Thousand ` : '';
+    str += (Number(nArray[4]) !== 0) ? `${getValue(nArray[4])} Hundred ` : '';
+    str += (Number(nArray[5]) !== 0) ? `${(str !== '') ? 'and ' : ''}${getValue(nArray[5])}` : '';
     return str.trim();
   }
 
@@ -130,7 +143,7 @@ export default function SolarBillGenerator() {
   const handleGeneratePDF = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!client.phone) {
-      alert('કૃપા કરીને કસ્ટમરનો WhatsApp મોબાઇલ નંબર દાખલ કરો.');
+      alert('Please enter the customer\'s WhatsApp mobile number.');
       return;
     }
 
@@ -311,10 +324,10 @@ export default function SolarBillGenerator() {
     
     doc.save(fileName);
 
-    // ૨. PDF ને Blob માં કન્વર્ટ કરો
+    // Convert the PDF to a Blob
     const pdfBlob = doc.output('blob');
 
-    // ૩. Backend API પર મોકલીને WhatsApp પર સીધી PDF મોકલો
+    // Send the PDF directly to WhatsApp via the backend API
     const formData = new FormData();
     formData.append('phone', client.phone);
     formData.append('clientName', client.name);

@@ -2,19 +2,25 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    
     const formData = await request.formData();
     const phone = formData.get('phone') as string;
     const clientName = formData.get('clientName') as string;
     const invoiceNo = formData.get('invoiceNo') as string;
     const grandTotal = formData.get('grandTotal') as string;
-    const pdfFile = formData.get('pdfFile'); 
+    const pdfFile = formData.get('pdfFile');
 
-    const PHONE_NUMBER_ID = '1266998173169930'; 
-    const ACCESS_TOKEN = 'EAAMORt8boNwBSnIHRuNVtGj00n9cRAqsrZAzocdt1iBpOMVG73Ta5g849s4ZBJgz5bAnzHH86y0iaXKgcaxUy8w3G5ZBLAyB8LTRuAAgRBRutZAp8Bo8toWeep6Kw4ZAhaRLF74pOWm6S94Q9A2qPlgh8QZAxTKgBau5bXs767dlPZBkwWmpis8f0vLN1JkZCTNZCDP4aXU0Pfi8pkGTutRrpECDgEnfaZBsjyxB8WBQLVsmmO8xdbM6ZC24ZBLOqshDHt0z79BqZB25VLQZB1xdANbqgZA';
+    const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
+    const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 
     if (!phone) {
       return NextResponse.json({ success: false, error: 'Phone number is missing' }, { status: 400 });
+    }
+
+    if (!PHONE_NUMBER_ID || !ACCESS_TOKEN) {
+      return NextResponse.json({
+        success: false,
+        error: 'WhatsApp credentials are missing. Add WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_ACCESS_TOKEN to your environment variables.'
+      }, { status: 500 });
     }
 
     

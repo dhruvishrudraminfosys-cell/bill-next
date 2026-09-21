@@ -135,7 +135,6 @@ export default function SolarBillGenerator() {
   const grandTotal = Number((subTotal + totalCgstAmount + totalSgstAmount).toFixed(2));
   const totalTaxAmount = Number((totalCgstAmount + totalSgstAmount).toFixed(2));
 
-  // Generate PDF, Upload to Vercel Blob & Open WhatsApp
   const handleGeneratePDF = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!client.phone) {
@@ -332,7 +331,7 @@ export default function SolarBillGenerator() {
       const finalPhone = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
       const formattedTotal = grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      const messageText = `Hello *${client.name || 'Customer'}*,\n\nHere is your Tax Invoice (*${client.invoiceNo}*) from *GREENEABLE SOLAR SOLUTION*:\n----------------------------------\n✅ *Grand Total:* *Rs. ${formattedTotal}*\n\n📄 *Download PDF Invoice here:*\n${downloadUrl}\n\nThank you for choosing solar energy!`;
+      const messageText = `Hello *${client.name || 'Customer'}*,\n\nHere is your Tax Invoice (*${client.invoiceNo}*) from *${company.name}*:\n----------------------------------\n✅ *Grand Total:* *Rs. ${formattedTotal}*\n\n📄 *Download PDF Invoice here:*\n${downloadUrl}\n\nThank you for choosing solar energy!`;
 
       const encodedMessage = encodeURIComponent(messageText);
       const waUrl = `https://wa.me/${finalPhone}?text=${encodedMessage}`;
@@ -351,12 +350,12 @@ export default function SolarBillGenerator() {
   };
 
   return (
-    <main className="max-w-6xl mx-auto p-6 space-y-10">
-      <div className="bg-white p-6 shadow-md rounded-lg border border-gray-200">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Aadhya Solar Bill Generator</h1>
+    <main className="max-w-6xl mx-auto p-4 sm:p-6 space-y-8">
+      <div className="bg-white p-4 sm:p-6 shadow-md rounded-lg border border-gray-200">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">Aadhya Solar Bill Generator</h1>
         
         <form onSubmit={handleGeneratePDF} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
             <h3 className="col-span-full font-bold text-gray-700">Client & Invoice Details</h3>
             <div>
               <label className="block text-xs font-medium text-gray-600">Client Name</label>
@@ -371,7 +370,7 @@ export default function SolarBillGenerator() {
               <input type="text" value={client.invoiceNo} onChange={e => setClient({...client, invoiceNo: e.target.value})} className="w-full p-2 border rounded text-sm mt-1 bg-white font-bold text-blue-700" required />
             </div>
 
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-xs font-medium text-gray-600">Street Address / Society / Plot</label>
               <input type="text" placeholder="e.g. PL-08, SHIVAM BUNGALOW" value={client.address} onChange={e => setClient({...client, address: e.target.value})} className="w-full p-2 border rounded text-sm mt-1 bg-white" required />
             </div>
@@ -392,11 +391,11 @@ export default function SolarBillGenerator() {
           <div className="bg-gray-50 p-4 rounded-md border">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-gray-700">Solar Items & Tax</h3>
-              <button type="button" onClick={addItemRow} className="bg-blue-600 text-white px-3 py-1 text-xs rounded font-bold hover:bg-blue-700">+ Add Item Row</button>
+              <button type="button" onClick={addItemRow} className="bg-blue-600 text-white px-3 py-1.5 text-xs rounded font-bold hover:bg-blue-700">+ Add Item</button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs bg-white border rounded">
+              <table className="w-full text-left text-xs bg-white border rounded min-w-[700px]">
                 <thead>
                   <tr className="bg-gray-200 border-b">
                     <th className="p-2">Description</th>
@@ -450,13 +449,14 @@ export default function SolarBillGenerator() {
         )}
       </div>
 
-      {/* LIVE PREVIEW SECTION */}
-      <div className="bg-white p-8 shadow-xl rounded-lg border border-gray-300">
-        <div className="flex justify-between items-center border-b pb-4 mb-6">
+      {/* LIVE PREVIEW SECTION (Fully Responsive Wrapper) */}
+      <div className="bg-white p-4 sm:p-8 shadow-xl rounded-lg border border-gray-300 overflow-x-auto">
+        <div className="flex justify-between items-center border-b pb-4 mb-6 min-w-[700px]">
           <h2 className="text-xl font-bold text-gray-800">📄 Aadhya Solar Tech Invoice</h2>
+          <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">Live Preview</span>
         </div>
 
-        <div className="border border-gray-400 p-6 rounded-md text-xs space-y-4 bg-white text-black">
+        <div className="border border-gray-400 p-4 sm:p-6 rounded-md text-xs space-y-4 bg-white text-black min-w-[700px]">
           {/* Header */}
           <div className="text-center font-bold text-sm tracking-wide">Tax Invoice</div>
 
@@ -595,4 +595,4 @@ export default function SolarBillGenerator() {
       </div>
     </main>
   );
-} 
+}

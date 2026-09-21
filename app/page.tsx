@@ -112,7 +112,7 @@ export default function SolarBillGenerator() {
   const addItemRow = () => {
     setItems([
       ...items,
-      { id: Date.now(), description: '', hsn: '', qty: '', rate: '', amount: 0, cgstRate: '', sgstRate: '' }
+      { id: Date.now(), description: '', hsn: '', qty: '', rate: '', amount: 0, cgstRate: 2.5, sgstRate: 2.5 }
     ]);
   };
 
@@ -123,12 +123,12 @@ export default function SolarBillGenerator() {
   const subTotal = Number(items.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0).toFixed(2));
   
   const totalCgstAmount = Number(items.reduce((acc, curr) => {
-    const cRate = curr.cgstRate === '' || isNaN(curr.cgstRate) ? 9 : Number(curr.cgstRate);
+    const cRate = curr.cgstRate === '' || isNaN(curr.cgstRate) ? 2.5 : Number(curr.cgstRate);
     return acc + ((curr.amount * cRate) / 100);
   }, 0).toFixed(2));
 
   const totalSgstAmount = Number(items.reduce((acc, curr) => {
-    const sRate = curr.sgstRate === '' || isNaN(curr.sgstRate) ? 9 : Number(curr.sgstRate);
+    const sRate = curr.sgstRate === '' || isNaN(curr.sgstRate) ? 2.5 : Number(curr.sgstRate);
     return acc + ((curr.amount * sRate) / 100);
   }, 0).toFixed(2));
 
@@ -258,8 +258,8 @@ export default function SolarBillGenerator() {
 
       doc.setFont('helvetica', 'normal');
       items.forEach(item => {
-        const cRate = item.cgstRate === '' || isNaN(item.cgstRate) ? 9 : Number(item.cgstRate);
-        const sRate = item.sgstRate === '' || isNaN(item.sgstRate) ? 9 : Number(item.sgstRate);
+        const cRate = item.cgstRate === '' || isNaN(item.cgstRate) ? 2.5 : Number(item.cgstRate);
+        const sRate = item.sgstRate === '' || isNaN(item.sgstRate) ? 2.5 : Number(item.sgstRate);
         const cAmt = Number(((item.amount * cRate) / 100).toFixed(2));
         const sAmt = Number(((item.amount * sRate) / 100).toFixed(2));
         
@@ -311,10 +311,8 @@ export default function SolarBillGenerator() {
       const safeInvoiceNo = client.invoiceNo.replace(/\//g, '_');
       const fileName = `Tax_Invoice_${safeInvoiceNo}.pdf`;
       
-      // 1. Local download
       doc.save(fileName);
 
-      // 2. Upload Blob to Vercel API
       const pdfBlob = doc.output('blob');
       const formData = new FormData();
       formData.append('file', pdfBlob, fileName);
@@ -330,7 +328,6 @@ export default function SolarBillGenerator() {
 
       const downloadUrl = data.url;
 
-      // 3. Format WhatsApp link
       const cleanPhone = client.phone.replace(/\D/g, '');
       const finalPhone = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
       const formattedTotal = grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -354,9 +351,9 @@ export default function SolarBillGenerator() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto p-6 space-y-10">
+    <main className="max-w-6xl mx-auto p-6 space-y-10">
       <div className="bg-white p-6 shadow-md rounded-lg border border-gray-200">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Solar Bill Generator (Vercel Blob + WhatsApp)</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Solar Bill Generator & Live Preview</h1>
         
         <form onSubmit={handleGeneratePDF} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
@@ -419,8 +416,8 @@ export default function SolarBillGenerator() {
                       <td className="p-2"><input type="text" placeholder="854140" value={item.hsn} onChange={e => handleItemChange(item.id, 'hsn', e.target.value)} className="w-20 p-1 border rounded text-xs bg-white" /></td>
                       <td className="p-2"><input type="text" placeholder="KW" value={item.qty} onChange={e => handleItemChange(item.id, 'qty', e.target.value)} className="w-20 p-1 border rounded text-xs bg-white" /></td>
                       <td className="p-2"><input type="number" placeholder="Rate" value={item.rate} onChange={e => handleItemChange(item.id, 'rate', e.target.value)} className="w-20 p-1 border rounded text-xs bg-white" /></td>
-                      <td className="p-2"><input type="number" placeholder="9" value={item.cgstRate} onChange={e => handleItemChange(item.id, 'cgstRate', e.target.value)} className="w-16 p-1 border rounded text-xs bg-white" /></td>
-                      <td className="p-2"><input type="number" placeholder="9" value={item.sgstRate} onChange={e => handleItemChange(item.id, 'sgstRate', e.target.value)} className="w-16 p-1 border rounded text-xs bg-white" /></td>
+                      <td className="p-2"><input type="number" placeholder="2.5" value={item.cgstRate} onChange={e => handleItemChange(item.id, 'cgstRate', e.target.value)} className="w-16 p-1 border rounded text-xs bg-white" /></td>
+                      <td className="p-2"><input type="number" placeholder="2.5" value={item.sgstRate} onChange={e => handleItemChange(item.id, 'sgstRate', e.target.value)} className="w-16 p-1 border rounded text-xs bg-white" /></td>
                       <td className="p-2 font-semibold">₹{Number(item.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                       <td className="p-2 text-center">
                         {items.length > 1 && (
@@ -452,6 +449,151 @@ export default function SolarBillGenerator() {
           </div>
         )}
       </div>
+
+      {/* LIVE PREVIEW SECTION */}
+      <div className="bg-white p-8 shadow-xl rounded-lg border border-gray-300">
+        <div className="flex justify-between items-center border-b pb-4 mb-6">
+          <h2 className="text-xl font-bold text-gray-800">📄 Live Invoice Preview</h2>
+          <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">Auto-updating</span>
+        </div>
+
+        <div className="border border-gray-400 p-6 rounded-md text-xs space-y-4 bg-white text-black">
+          {/* Header */}
+          <div className="text-center font-bold text-sm tracking-wide">Tax Invoice</div>
+
+          {/* Company & Invoice Info Box */}
+          <div className="grid grid-cols-2 border border-black">
+            <div className="p-3 border-r border-black space-y-0.5">
+              <div className="font-bold text-sm">{company.name}</div>
+              <div>{company.address}, {company.city} - {company.pincode}</div>
+              <div>MO. No. {company.phone}</div>
+              <div>GSTIN/UIN: {company.gstin}</div>
+              <div>State Name : {company.state}</div>
+            </div>
+            <div className="p-3 space-y-1">
+              <div><span className="font-semibold">Invoice No. :</span> {client.invoiceNo}</div>
+              <div><span className="font-semibold">e-Way Bill No. :</span> {client.eWayBillNo || '---'}</div>
+              <div><span className="font-semibold">Dated :</span> {currentDate}</div>
+              <div><span className="font-semibold">State Name :</span> {company.state}</div>
+            </div>
+          </div>
+
+          {/* Buyer Info Box */}
+          <div className="border border-black p-3 space-y-0.5">
+            <div className="font-bold">Buyer (Bill to)</div>
+            <div className="font-semibold text-sm">{client.name || '---'}</div>
+            <div>{client.address ? client.address + ', ' : ''}{client.city} - {client.pincode}</div>
+            <div>State Name : {client.state}</div>
+            <div>Phone No. : +91 {client.phone || '---'}</div>
+          </div>
+
+          {/* Items Table */}
+          <table className="w-full border-collapse border border-black text-center">
+            <thead>
+              <tr className="bg-gray-100 border-b border-black">
+                <th className="border-r border-black p-1.5 w-10">Sl No.</th>
+                <th className="border-r border-black p-1.5 text-left">Description of Goods and Services</th>
+                <th className="border-r border-black p-1.5 w-20">HSN/SAC</th>
+                <th className="border-r border-black p-1.5 w-16">Quantity</th>
+                <th className="p-1.5 text-right w-24">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, idx) => (
+                <tr key={item.id} className="border-b border-black">
+                  <td className="border-r border-black p-1.5">{idx + 1}</td>
+                  <td className="border-r border-black p-1.5 text-left">{item.description || '---'}</td>
+                  <td className="border-r border-black p-1.5">{item.hsn || '---'}</td>
+                  <td className="border-r border-black p-1.5">{item.qty || '---'}</td>
+                  <td className="p-1.5 text-right">Rs. {Number(item.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan={4} className="border-r border-black text-right font-bold p-1.5">Sub Total</td>
+                <td className="text-right font-bold p-1.5">Rs. {subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              </tr>
+              <tr>
+                <td colSpan={4} className="border-r border-black text-right font-bold p-1.5">CGST</td>
+                <td className="text-right font-bold p-1.5">Rs. {totalCgstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              </tr>
+              <tr>
+                <td colSpan={4} className="border-r border-black text-right font-bold p-1.5">SGST</td>
+                <td className="text-right font-bold p-1.5">Rs. {totalSgstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              </tr>
+              <tr className="bg-gray-50 border-t border-black font-bold">
+                <td colSpan={4} className="border-r border-black text-right p-1.5">Grand Total</td>
+                <td className="text-right p-1.5">Rs. {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* Amount in words */}
+          <div className="border border-black p-2">
+            <div className="text-[10px] text-gray-600">Amount Chargeable (in words)</div>
+            <div className="font-bold">{numberToWords(grandTotal)}</div>
+          </div>
+
+          {/* Tax Breakdown Table */}
+          <table className="w-full border-collapse border border-black text-center">
+            <thead>
+              <tr className="bg-gray-100 border-b border-black">
+                <th className="border-r border-black p-1.5">HSN/SAC</th>
+                <th className="border-r border-black p-1.5">Taxable Value</th>
+                <th className="border-r border-black p-1.5">CGST Amount</th>
+                <th className="border-r border-black p-1.5">SGST Amount</th>
+                <th className="p-1.5">Total Tax Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(item => {
+                const cRate = item.cgstRate === '' || isNaN(item.cgstRate) ? 2.5 : Number(item.cgstRate);
+                const sRate = item.sgstRate === '' || isNaN(item.sgstRate) ? 2.5 : Number(item.sgstRate);
+                const cAmt = Number(((item.amount * cRate) / 100).toFixed(2));
+                const sAmt = Number(((item.amount * sRate) / 100).toFixed(2));
+                return (
+                  <tr key={item.id} className="border-b border-black">
+                    <td className="border-r border-black p-1.5">{item.hsn || '---'}</td>
+                    <td className="border-r border-black p-1.5">Rs. {item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className="border-r border-black p-1.5">Rs. {cAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className="border-r border-black p-1.5">Rs. {sAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                    <td className="p-1.5">Rs. {(cAmt + sAmt).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                );
+              })}
+              <tr className="font-bold border-t border-black">
+                <td className="border-r border-black p-1.5">Total</td>
+                <td className="border-r border-black p-1.5">Rs. {subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="border-r border-black p-1.5">Rs. {totalCgstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="border-r border-black p-1.5">Rs. {totalSgstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="p-1.5">Rs. {totalTaxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* Declaration & Bank Details */}
+          <div className="grid grid-cols-2 border border-black">
+            <div className="p-3 border-r border-black space-y-1">
+              <div className="font-bold">Declaration</div>
+              <div className="text-[10px] leading-tight text-gray-700">
+                We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
+              </div>
+            </div>
+            <div className="p-3 space-y-0.5">
+              <div className="font-bold">Company's Bank Details</div>
+              <div>A/c Holder's Name : {company.name}</div>
+              <div>Bank Name : {company.bankName}</div>
+              <div>A/c No. : {company.accountNo}</div>
+              <div>Branch & IFSC Code : {company.ifsc}</div>
+            </div>
+          </div>
+
+          {/* Signature Footer */}
+          <div className="border border-black p-4 text-right flex flex-col justify-end h-20">
+            <div className="font-bold">for {company.name}</div>
+            <div className="mt-6 text-[10px] text-gray-600">Authorised Signatory</div>
+          </div>
+        </div>
+      </div>
     </main>
   );
-}
+} 

@@ -453,8 +453,7 @@ export default function SolarBillGenerator() {
       {/* LIVE PREVIEW SECTION */}
       <div className="bg-white p-8 shadow-xl rounded-lg border border-gray-300">
         <div className="flex justify-between items-center border-b pb-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-800">📄 Live Invoice Preview</h2>
-          <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">Auto-updating</span>
+          <h2 className="text-xl font-bold text-gray-800">📄 Aadhya Solar Tech Invoice</h2>
         </div>
 
         <div className="border border-gray-400 p-6 rounded-md text-xs space-y-4 bg-white text-black">

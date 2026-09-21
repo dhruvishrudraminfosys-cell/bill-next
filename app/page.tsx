@@ -56,12 +56,12 @@ function numberToWords(num: number): string {
 
 export default function SolarBillGenerator() {
   const [company] = useState({
-    name: 'GREENEABLE SOLAR SOLUTION',
+    name: 'Aadhya Solar Tech',
     address: '215, ESCON PLAZA, ABOVE SBI BANK, AMROLI',
     city: 'SURAT',
     pincode: '394107',
     state: 'Gujarat',
-    phone: '99131 68126',
+    phone: '+91 7284810210',
     gstin: '24CBAPB8912R1ZG',
     bankName: 'ICICI BANK LTD (2898)',
     accountNo: '183605002898',
@@ -353,7 +353,7 @@ export default function SolarBillGenerator() {
   return (
     <main className="max-w-6xl mx-auto p-6 space-y-10">
       <div className="bg-white p-6 shadow-md rounded-lg border border-gray-200">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Solar Bill Generator & Live Preview</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Aadhya Solar Bill Generator</h1>
         
         <form onSubmit={handleGeneratePDF} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
